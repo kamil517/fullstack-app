@@ -416,5 +416,4 @@ app.listen(PORT, () => {
     console.log(`\n✅ Server running on http://localhost:${PORT}`);
     console.log(`📁 Uploads folder: ${path.join(__dirname, 'uploads')}`);
     console.log(`\n🔗 Test: http://localhost:${PORT}/test`);
-});/ /   F o r c e   r e d e p l o y   -   0 7 / 2 2 / 2 0 2 6   1 7 : 1 8 : 1 3  
- 
+});
