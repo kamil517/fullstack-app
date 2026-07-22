@@ -417,3 +417,15 @@ app.listen(PORT, () => {
     console.log(`📁 Uploads folder: ${path.join(__dirname, 'uploads')}`);
     console.log(`\n🔗 Test: http://localhost:${PORT}/test`);
 });
+// ── EXPORT FOR VERCEL ──
+module.exports = app;
+
+// ── START SERVER (LOCAL) ──
+if (require.main === module) {
+    const PORT = process.env.PORT || 8080;
+    app.listen(PORT, () => {
+        console.log(`\n✅ Server running on http://localhost:${PORT}`);
+        console.log(`📁 Uploads folder: ${path.join(__dirname, 'uploads')}`);
+        console.log(`\n🔗 Test: http://localhost:${PORT}/test`);
+    });
+}
