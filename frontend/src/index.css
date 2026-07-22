@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Apply Montserrat font to everything */
+* {
+  font-family: 'Montserrat', sans-serif;
+}
+
+body {
+  font-family: 'Montserrat', sans-serif;
+  /* ── REMOVED THE GRADIENT ── */
+  background-color: #f3f4f6;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+}
+
+/* Rest of your CSS stays the same */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
+
+/* ── REMOVE THIS LINE ── */
+/* body {
+  padding-top: 70px;
+} */
+
+.fixed {
+  position: fixed;
+}
+
+.inset-0 {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.z-10 {
+  z-index: 10;
+}
+
+.z-20 {
+  z-index: 20;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+@media (max-width: 768px) {
+  .text-5xl {
+    font-size: 2rem;
+  }
+  .text-6xl {
+    font-size: 2.5rem;
+  }
+  .text-xl {
+    font-size: 1rem;
+  }
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-animate {
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-animate:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s;
+}
+
+.btn-animate:active:after {
+  width: 100%;
+  height: 100%;
+  padding-top: 100%;
+}
+
+.hover-card {
+  transition: all 0.3s ease;
+}
+
+.hover-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.bg-gradient-success {
+  background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+}
+
+.bg-gradient-warning {
+  background: linear-gradient(135deg, #fccb90 0%, #d57eeb 100%);
+}
+
+.bg-gradient-danger {
+  background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+}
+/* Add to your style tag */
+.contact-card-hover {
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+}
+
+.contact-card-hover:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.contact-input-animate {
+  transition: all 0.3s ease;
+}
+
+.contact-input-animate:focus {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(81, 88, 187, 0.15);
+}
