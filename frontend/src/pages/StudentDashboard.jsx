@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+// ── DYNAMIC API URL ──
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const StudentDashboard = () => {
   const [user, setUser] = useState(null);
   const [notices, setNotices] = useState([]);
@@ -35,7 +38,7 @@ const StudentDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/notices");
+      const response = await fetch(`${API_URL}/api/notices`);
       const data = await response.json();
       setNotices(data);
       setFilteredNotices(data);
@@ -77,8 +80,6 @@ const StudentDashboard = () => {
   const categories = ["all", "Academic", "Event", "Announcement", "Exam"];
 
   return (
-
-
     <div className="min-h-screen bg-gradient-to-br from-purple-200 via-blue-100 to-indigo-200 p-6 pt-24 perspective-1000">
     
       {/* ── MAIN CONTAINER with 3D Hover Effect ── */}
@@ -220,7 +221,7 @@ const StudentDashboard = () => {
                       transition-all duration-300 hover:scale-105 hover:translate-x-1">
                       {notice.title}
                     </td>
-                    <td className="py-3 px-4 text-gray-600">{notice.content.substring(0, 40)}...</td>
+                    <td className="py-3 px-4 text-gray-600">{notice.content?.substring(0, 40)}...</td>
                     <td className="py-3 px-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium 
                         transition-all duration-300 hover:scale-110 hover:shadow-md inline-block ${
@@ -233,7 +234,7 @@ const StudentDashboard = () => {
                     <td className="py-3 px-4">
                       {notice.fileUrl ? (
                         <a 
-                          href={`http://localhost:8080${notice.fileUrl}`} 
+                          href={`${API_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:text-blue-700 hover:underline text-xs transition-all duration-300 hover:scale-110 inline-block"
@@ -302,14 +303,14 @@ const StudentDashboard = () => {
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(viewingNotice.fileType) ? (
                   <img 
-                    src={`http://localhost:8080${viewingNotice.fileUrl}`} 
+                    src={`${API_URL}${viewingNotice.fileUrl}`} 
                     alt={viewingNotice.fileName}
                     className="max-w-full max-h-64 rounded-lg border border-gray-200
                       transition-all duration-500 hover:scale-105 hover:shadow-xl"
                   />
                 ) : (
                   <a 
-                    href={`http://localhost:8080${viewingNotice.fileUrl}`} 
+                    href={`${API_URL}${viewingNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-2

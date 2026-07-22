@@ -2,6 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/bitec.png";
 
+// ── DYNAMIC API URL ──
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +27,7 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -53,7 +56,8 @@ const Login = () => {
         setError(data.message || "Login failed");
       }
     } catch (err) {
-      setError("Cannot connect to server. Make sure backend is running on port 8080");
+      console.error("Login error:", err);
+      setError("Cannot connect to server. Please try again.");
     }
     
     setLoading(false);
@@ -86,8 +90,6 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Brand Name - Navbar Color */}
-        
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-3 rounded-lg mb-6 text-sm">
               {error}

@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+// ── DYNAMIC API URL ──
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const FacultyDashboard = () => {
   const [user, setUser] = useState(null);
   const [notices, setNotices] = useState([]);
@@ -42,7 +45,7 @@ const FacultyDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/notices");
+      const response = await fetch(`${API_URL}/api/notices`);
       const data = await response.json();
       setNotices(data);
     } catch (error) {
@@ -71,8 +74,8 @@ const FacultyDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const url = editingId 
-        ? `http://localhost:8080/api/notices/${editingId}`
-        : "http://localhost:8080/api/notices";
+        ? `${API_URL}/api/notices/${editingId}`
+        : `${API_URL}/api/notices`;
       
       const method = editingId ? "PUT" : "POST";
 
@@ -124,11 +127,11 @@ const FacultyDashboard = () => {
         setShowForm(false);
         setEditingId(null);
         fetchNotices();
-        alert(editingId ? " Notice updated successfully!" : " Notice created successfully!");
+        alert(editingId ? "✅ Notice updated successfully!" : "✅ Notice created successfully!");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert(" Error saving notice");
+      alert("❌ Error saving notice");
     } finally {
       setSubmitting(false);
     }
@@ -146,9 +149,9 @@ const FacultyDashboard = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("⚠️ Are you sure you want to delete this notice?")) {
-      await fetch(`http://localhost:8080/api/notices/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/api/notices/${id}`, { method: "DELETE" });
       fetchNotices();
-      alert(" Notice deleted successfully!");
+      alert("🗑️ Notice deleted successfully!");
     }
   };
 
@@ -173,21 +176,18 @@ const FacultyDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-200 via-blue-100 to-indigo-200 p-6 pt-24">
       
-      {/* ── MAIN CONTAINER ── */}
       <div className="w-full max-w-7xl mx-auto bg-white/70 backdrop-blur-lg rounded-2xl shadow-2xl p-6 border border-white/30">
         
-        {/* ── GOLD HEADER (NO BLUE NAVBAR) ── */}
         <div className="flex justify-between items-center mb-6 pb-4 border-b border-gray-200/50">
           <div>
             <h1 className="text-3xl font-extrabold tracking-wide 
               bg-gradient-to-r from-yellow-500 via-yellow-600 to-amber-600 
-              bg-clip-text text-transparent
-              drop-shadow-[0_0_15px_rgba(255,215,0,0.2)]">
+              bg-clip-text text-transparent">
                Faculty Dashboard
             </h1>
             <p className="text-gray-700 text-sm mt-1 flex items-center gap-2">
               <span className="text-lg">🌟</span> 
-              Welcome back, <span className="font-bold text-amber-600 drop-shadow-[0_0_8px_rgba(255,215,0,0.2)]">Prof. {user?.name}</span>!
+              Welcome back, <span className="font-bold text-amber-600">Prof. {user?.name}</span>!
               <span className="text-lg">🌟</span>
             </p>
           </div>
@@ -203,32 +203,24 @@ const FacultyDashboard = () => {
           </button>
         </div>
 
-        {/* ── STATS CARDS with Gold Accents ── */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white/60 backdrop-blur rounded-xl p-4 text-center shadow-lg hover:shadow-yellow-400/30 border border-white/50 hover:border-yellow-400/50 transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center text-3xl mb-2">
-              <i className="fas fa-file-alt text-yellow-400"></i>
-            </div>
-            <div className="text-2xl font-bold text-amber-600 drop-shadow-[0_0_10px_rgba(255,215,0,0.15)]">{notices.length}</div>
+            <div className="flex justify-center text-3xl mb-2">📋</div>
+            <div className="text-2xl font-bold text-amber-600">{notices.length}</div>
             <div className="text-gray-600 text-sm">Total Notices</div>
           </div>
           <div className="bg-white/60 backdrop-blur rounded-xl p-4 text-center shadow-lg hover:shadow-green-400/30 border border-white/50 hover:border-green-400/50 transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center text-3xl mb-2">
-              <i className="fas fa-user-edit text-green-500"></i>
-            </div>
-            <div className="text-2xl font-bold text-green-600 drop-shadow-[0_0_10px_rgba(34,197,94,0.15)]">{notices.filter(n => n.author?.name === user?.name).length}</div>
+            <div className="flex justify-center text-3xl mb-2">✏️</div>
+            <div className="text-2xl font-bold text-green-600">{notices.filter(n => n.author?.name === user?.name).length}</div>
             <div className="text-gray-600 text-sm">My Notices</div>
           </div>
           <div className="bg-white/60 backdrop-blur rounded-xl p-4 text-center shadow-lg hover:shadow-purple-400/30 border border-white/50 hover:border-purple-400/50 transition-all duration-300 hover:scale-105">
-            <div className="flex justify-center text-3xl mb-2">
-              <i className="fas fa-calendar-day text-purple-500"></i>
-            </div>
-            <div className="text-2xl font-bold text-purple-600 drop-shadow-[0_0_10px_rgba(168,85,247,0.15)]">{new Date().toLocaleDateString()}</div>
+            <div className="flex justify-center text-3xl mb-2">📅</div>
+            <div className="text-2xl font-bold text-purple-600">{new Date().toLocaleDateString()}</div>
             <div className="text-gray-600 text-sm">Today's Date</div>
           </div>
         </div>
 
-        {/* ── CREATE NOTICE BUTTON ── */}
         <div className="mb-6">
           <button
             onClick={() => { 
@@ -245,21 +237,19 @@ const FacultyDashboard = () => {
               text-white shadow-md hover:shadow-yellow-400/30
               transition-all duration-300 hover:scale-105"
           >
-            {showForm ? " Cancel" : " Create New Notice"}
+            {showForm ? "❌ Cancel" : "➕ Create New Notice"}
           </button>
         </div>
 
-        {/* ── CREATE/EDIT FORM ── */}
         {showForm && (
           <div className="bg-white/60 backdrop-blur rounded-xl p-6 mb-6 shadow-lg border border-white/50">
             <h3 className="text-lg font-bold text-amber-700 mb-4 flex items-center gap-2">
-              <span className="text-xl"></span>
-              {editingId ? " Edit Notice" : "Create New Notice"}
+              {editingId ? "✏️ Edit Notice" : "📝 Create New Notice"}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
                 type="text"
-                placeholder=" Notice Title"
+                placeholder="📌 Notice Title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="w-full p-3 rounded-xl bg-white/70 border border-gray-200 
@@ -268,7 +258,7 @@ const FacultyDashboard = () => {
                 required
               />
               <textarea
-                placeholder=" Notice Content"
+                placeholder="📝 Notice Content"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 className="w-full p-3 rounded-xl bg-white/70 border border-gray-200 
@@ -287,11 +277,10 @@ const FacultyDashboard = () => {
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
 
-              {/* ── FILE UPLOAD ── */}
               <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-yellow-400 transition-all duration-300">
                 {!file ? (
                   <label className="cursor-pointer block text-center text-gray-500">
-                    <span className="text-3xl block"></span>
+                    <span className="text-3xl block">📎</span>
                     <span>Click to attach file (PDF, JPEG, PNG, GIF)</span>
                     <input 
                       type="file" 
@@ -303,7 +292,7 @@ const FacultyDashboard = () => {
                 ) : (
                   <div className="space-y-2">
                     <div className="flex justify-between items-center bg-white/70 p-2 rounded-lg">
-                      <span className="text-sm"> {file.name}</span>
+                      <span className="text-sm">📄 {file.name}</span>
                       <button 
                         type="button"
                         onClick={() => {
@@ -331,17 +320,16 @@ const FacultyDashboard = () => {
                   text-white shadow-md hover:shadow-yellow-400/30
                   transition-all duration-300 hover:scale-105 disabled:opacity-50"
               >
-                {submitting ? " Saving..." : (editingId ? " Update Notice" : " Publish Notice")}
+                {submitting ? "⏳ Saving..." : (editingId ? "💾 Update Notice" : "📤 Publish Notice")}
               </button>
             </form>
           </div>
         )}
 
-        {/* ── SEARCH ── */}
         <div className="mb-6">
           <input
             type="text"
-            placeholder=" Search notices..."
+            placeholder="🔍 Search notices..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2.5 rounded-xl bg-white/70 border border-gray-200 
@@ -350,9 +338,8 @@ const FacultyDashboard = () => {
           />
         </div>
 
-        {/* ── NOTICES TABLE ── */}
-        <h2 className="text-lg font-bold text-amber-700 mb-4 flex items-center gap-2 drop-shadow-[0_0_10px_rgba(255,215,0,0.1)]">
-          <span> </span> All Notices
+        <h2 className="text-lg font-bold text-amber-700 mb-4 flex items-center gap-2">
+          📋 All Notices
         </h2>
         
         <div className="overflow-x-auto rounded-xl border border-gray-200/50">
@@ -377,7 +364,7 @@ const FacultyDashboard = () => {
                   }`}
                 >
                   <td className="py-3 px-4 font-medium text-amber-700">{notice.title}</td>
-                  <td className="py-3 px-4 text-gray-600">{notice.content.substring(0, 40)}...</td>
+                  <td className="py-3 px-4 text-gray-600">{notice.content?.substring(0, 40)}...</td>
                   <td className="py-3 px-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       notice.category === "Academic" ? "bg-blue-100 text-blue-700" :
@@ -389,12 +376,12 @@ const FacultyDashboard = () => {
                   <td className="py-3 px-4">
                     {notice.fileUrl ? (
                       <a 
-                        href={`http://localhost:8080${notice.fileUrl}`} 
+                        href={`${API_URL}${notice.fileUrl}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:text-blue-700 hover:underline text-xs transition-colors"
                       >
-                        {isImage(notice.fileType) ? 'Image' : ' PDF'}
+                        {isImage(notice.fileType) ? '🖼️ Image' : '📄 PDF'}
                       </a>
                     ) : (
                       <span className="text-gray-400 text-xs">—</span>
@@ -434,7 +421,7 @@ const FacultyDashboard = () => {
             </tbody>
           </table>
           {filteredNotices.length === 0 && (
-            <div className="text-center py-8 text-gray-500"> No notices found.</div>
+            <div className="text-center py-8 text-gray-500">📭 No notices found.</div>
           )}
         </div>
       </div>
@@ -444,8 +431,8 @@ const FacultyDashboard = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
           <div className="bg-white rounded-2xl p-6 w-[500px] max-w-[90%] max-h-[80vh] overflow-y-auto shadow-2xl border border-yellow-200">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-2xl"></span>
-              <h2 className="text-xl font-bold text-amber-700 drop-shadow-[0_0_10px_rgba(255,215,0,0.1)]">
+              <span className="text-2xl">📄</span>
+              <h2 className="text-xl font-bold text-amber-700">
                 {viewingNotice.title}
               </h2>
             </div>
@@ -457,7 +444,7 @@ const FacultyDashboard = () => {
                 "bg-gray-100 text-gray-700"
               }`}>{viewingNotice.category || "General"}</span>
               <span className="text-xs text-gray-500 flex items-center gap-1">
-                 {new Date(viewingNotice.createdAt).toLocaleString()}
+                📅 {new Date(viewingNotice.createdAt).toLocaleString()}
               </span>
             </div>
             <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-200">
@@ -469,18 +456,18 @@ const FacultyDashboard = () => {
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(viewingNotice.fileType) ? (
                   <img 
-                    src={`http://localhost:8080${viewingNotice.fileUrl}`} 
+                    src={`${API_URL}${viewingNotice.fileUrl}`} 
                     alt={viewingNotice.fileName}
                     className="max-w-full max-h-64 rounded-lg border border-gray-200"
                   />
                 ) : (
                   <a 
-                    href={`http://localhost:8080${viewingNotice.fileUrl}`} 
+                    href={`${API_URL}${viewingNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-2"
                   >
-                     {viewingNotice.fileName}
+                    📄 {viewingNotice.fileName}
                   </a>
                 )}
               </div>
@@ -503,7 +490,6 @@ const FacultyDashboard = () => {
         </div>
       )}
 
-      {/* ── ANIMATION STYLES ── */}
       <style>{`
         @keyframes fadeIn {
           from {

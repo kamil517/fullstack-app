@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+// ── DYNAMIC API URL ──
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
   const [users, setUsers] = useState([]);
@@ -27,7 +30,7 @@ const AdminDashboard = () => {
   const [showNoticeModal, setShowNoticeModal] = useState(false);
   const [viewingNotice, setViewingNotice] = useState(null);
   
-  // ── NEW: File upload states ──
+  // ── File upload states ──
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -59,7 +62,7 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/users");
+      const response = await fetch(`${API_URL}/api/users`);
       const data = await response.json();
       setUsers(data);
     } catch (error) {
@@ -69,7 +72,7 @@ const AdminDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/notices");
+      const response = await fetch(`${API_URL}/api/notices`);
       const data = await response.json();
       const active = data.filter(n => !n.isArchived);
       const archived = data.filter(n => n.isArchived);
@@ -80,7 +83,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // ── NEW: Handle file selection ──
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -95,7 +97,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // ── UPDATED: Handle create/update with file ──
   const handleCreateNotice = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -111,10 +112,9 @@ const AdminDashboard = () => {
         formData.append('file', file);
       }
 
-      const response = await fetch("http://localhost:8080/api/notices", {
+      const response = await fetch(`${API_URL}/api/notices`, {
         method: "POST",
         body: formData
-        // No Content-Type header - browser sets it with boundary for FormData
       });
       
       if (response.ok) {
@@ -148,15 +148,12 @@ const AdminDashboard = () => {
     setShowNoticeForm(true);
   };
 
-  // ── UPDATED: Handle update (edit) ──
   const handleUpdateNotice = async (e) => {
     e.preventDefault();
     setSubmitting(true);
     
     try {
-      // For edit, we'll use JSON (file upload on edit is more complex)
-      // But we'll keep it simple - edit just text, not file
-      const response = await fetch(`http://localhost:8080/api/notices/${editingNoticeId}`, {
+      const response = await fetch(`${API_URL}/api/notices/${editingNoticeId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, content, category })
@@ -184,7 +181,7 @@ const AdminDashboard = () => {
   const archiveNotice = async (id) => {
     if (window.confirm("Archive this notice?")) {
       try {
-        await fetch(`http://localhost:8080/api/notices/archive/${id}`, { method: "PUT" });
+        await fetch(`${API_URL}/api/notices/archive/${id}`, { method: "PUT" });
         fetchNotices();
         alert("✅ Notice archived!");
       } catch (error) {
@@ -196,7 +193,7 @@ const AdminDashboard = () => {
   const restoreNotice = async (id) => {
     if (window.confirm("Restore this notice?")) {
       try {
-        await fetch(`http://localhost:8080/api/notices/restore/${id}`, { method: "PUT" });
+        await fetch(`${API_URL}/api/notices/restore/${id}`, { method: "PUT" });
         fetchNotices();
         alert("✅ Notice restored!");
       } catch (error) {
@@ -208,7 +205,7 @@ const AdminDashboard = () => {
   const permanentDeleteNotice = async (id) => {
     if (window.confirm("⚠️ Permanently delete this notice?")) {
       try {
-        await fetch(`http://localhost:8080/api/notices/${id}`, { method: "DELETE" });
+        await fetch(`${API_URL}/api/notices/${id}`, { method: "DELETE" });
         fetchNotices();
         alert("✅ Notice permanently deleted!");
       } catch (error) {
@@ -233,7 +230,7 @@ const AdminDashboard = () => {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${editingUser._id}`, {
+      const response = await fetch(`${API_URL}/api/users/${editingUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -258,7 +255,7 @@ const AdminDashboard = () => {
   const deleteUser = async (id) => {
     if (window.confirm("Delete this user?")) {
       try {
-        await fetch(`http://localhost:8080/api/users/${id}`, { method: "DELETE" });
+        await fetch(`${API_URL}/api/users/${id}`, { method: "DELETE" });
         fetchUsers();
         alert("✅ User deleted!");
       } catch (error) {
@@ -270,7 +267,7 @@ const AdminDashboard = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:8080/api/users/${user._id}`, {
+      const response = await fetch(`${API_URL}/api/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -298,7 +295,6 @@ const AdminDashboard = () => {
     navigate("/login");
   };
 
-  // ── Helper to check if file is image ──
   const isImage = (fileType) => fileType?.startsWith('image/');
 
   const stats = {
@@ -410,7 +406,6 @@ const AdminDashboard = () => {
                     <option value="Exam">Exam</option>
                   </select>
 
-                  {/* ── FILE UPLOAD ── */}
                   {!editingNoticeId && (
                     <div className="mb-3 border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-400 transition">
                       {!file ? (
@@ -474,7 +469,7 @@ const AdminDashboard = () => {
                 {filteredNotices.map((notice) => (
                   <tr key={notice._id} className="border-b hover:bg-white/40 transition">
                     <td className="py-3 font-medium">{notice.title}</td>
-                    <td className="py-3 text-gray-600">{notice.content.substring(0, 40)}...</td>
+                    <td className="py-3 text-gray-600">{notice.content?.substring(0, 40)}...</td>
                     <td className="py-3">
                       <span className={`px-2 py-1 rounded text-xs ${
                         notice.category === "Academic" ? "bg-blue-100 text-blue-700" :
@@ -486,7 +481,7 @@ const AdminDashboard = () => {
                     <td className="py-3">
                       {notice.fileUrl ? (
                         <a 
-                          href={`http://localhost:8080${notice.fileUrl}`} 
+                          href={`${API_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline text-xs"
@@ -530,7 +525,7 @@ const AdminDashboard = () => {
                 {filteredArchived.map((notice) => (
                   <tr key={notice._id} className="border-b hover:bg-white/40 transition">
                     <td className="py-3 font-medium">{notice.title}</td>
-                    <td className="py-3 text-gray-600">{notice.content.substring(0, 40)}...</td>
+                    <td className="py-3 text-gray-600">{notice.content?.substring(0, 40)}...</td>
                     <td className="py-3">
                       <span className={`px-2 py-1 rounded text-xs ${
                         notice.category === "Academic" ? "bg-blue-100 text-blue-700" :
@@ -542,7 +537,7 @@ const AdminDashboard = () => {
                     <td className="py-3">
                       {notice.fileUrl ? (
                         <a 
-                          href={`http://localhost:8080${notice.fileUrl}`} 
+                          href={`${API_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline text-xs"
@@ -641,19 +636,18 @@ const AdminDashboard = () => {
             </div>
             <p className="text-gray-600 mb-4 whitespace-pre-wrap">{viewingNotice.content}</p>
             
-            {/* ── FILE ATTACHMENT IN MODAL ── */}
             {viewingNotice.fileUrl && (
               <div className="mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(viewingNotice.fileType) ? (
                   <img 
-                    src={`http://localhost:8080${viewingNotice.fileUrl}`} 
+                    src={`${API_URL}${viewingNotice.fileUrl}`} 
                     alt={viewingNotice.fileName}
                     className="max-w-full max-h-64 rounded-lg"
                   />
                 ) : (
                   <a 
-                    href={`http://localhost:8080${viewingNotice.fileUrl}`} 
+                    href={`${API_URL}${viewingNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline flex items-center gap-2"

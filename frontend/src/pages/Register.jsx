@@ -2,6 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/bitec.png";
 
+// ── DYNAMIC API URL ──
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,7 +22,7 @@ function Register() {
     setLoading(true);
     
     try {
-      const response = await fetch('http://localhost:8080/api/auth/register', {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, role }),
@@ -34,7 +37,8 @@ function Register() {
         setError(data.message || "Registration failed");
       }
     } catch (err) {
-      setError("Cannot connect to server. Make sure backend is running on port 8080");
+      console.error("Registration error:", err);
+      setError("Cannot connect to server. Please try again.");
     }
     
     setLoading(false);

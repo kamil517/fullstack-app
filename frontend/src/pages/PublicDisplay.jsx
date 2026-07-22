@@ -1,6 +1,9 @@
 import { useEffect, useState, useRef } from "react";
 import logo from "../assets/bitec.png"; // Your logo
 
+// ── DYNAMIC API URL ──
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 const PublicDisplay = () => {
   const [notices, setNotices] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -27,7 +30,7 @@ const PublicDisplay = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/notices");
+      const response = await fetch(`${API_URL}/api/notices`);
       const data = await response.json();
       setNotices(data);
       setLoading(false);
@@ -217,13 +220,13 @@ const PublicDisplay = () => {
                   {currentNotice?.content}
                 </p>
 
-                {/* ── FILE ATTACHMENT (NEW) ── */}
+                {/* ── FILE ATTACHMENT ── */}
                 {currentNotice?.fileUrl && (
                   <div className="mb-6 p-4 bg-white/10 rounded-xl border border-white/10">
                     {isImage(currentNotice.fileType) ? (
                       <div className="text-center">
                         <img 
-                          src={`http://localhost:8080${currentNotice.fileUrl}`} 
+                          src={`${API_URL}${currentNotice.fileUrl}`} 
                           alt={currentNotice.fileName}
                           className="max-w-full max-h-96 rounded-lg mx-auto shadow-lg"
                         />
@@ -235,7 +238,7 @@ const PublicDisplay = () => {
                         <div>
                           <p className="text-white text-lg font-medium">{currentNotice.fileName}</p>
                           <a 
-                            href={`http://localhost:8080${currentNotice.fileUrl}`} 
+                            href={`${API_URL}${currentNotice.fileUrl}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-blue-400 hover:text-blue-300 underline text-sm"
@@ -250,7 +253,7 @@ const PublicDisplay = () => {
                         <div>
                           <p className="text-white text-lg font-medium">{currentNotice.fileName}</p>
                           <a 
-                            href={`http://localhost:8080${currentNotice.fileUrl}`} 
+                            href={`${API_URL}${currentNotice.fileUrl}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-blue-400 hover:text-blue-300 underline text-sm"

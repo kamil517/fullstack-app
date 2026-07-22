@@ -684,13 +684,13 @@ export default function Home() {
                     <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
                       {isImage(notice.fileType) ? (
                         <img 
-                          src={`http://localhost:8080${notice.fileUrl}`} 
+                          src={`${API_URL}${notice.fileUrl}`} 
                           alt={notice.fileName}
                           className="w-full max-h-48 object-cover rounded-lg"
                         />
                       ) : (
                         <a 
-                          href={`http://localhost:8080${notice.fileUrl}`} 
+                          href={`${API_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline flex items-center gap-2 text-sm"
@@ -759,13 +759,13 @@ export default function Home() {
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(selectedNotice.fileType) ? (
                   <img 
-                    src={`http://localhost:8080${selectedNotice.fileUrl}`} 
+                    src={`${API_URL}${selectedNotice.fileUrl}`} 
                     alt={selectedNotice.fileName}
                     className="w-full max-h-64 object-contain rounded-lg"
                   />
                 ) : (
                   <a 
-                    href={`http://localhost:8080${selectedNotice.fileUrl}`} 
+                    href={`${API_URL}${selectedNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline flex items-center gap-2"
