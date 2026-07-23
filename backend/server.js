@@ -11,15 +11,7 @@ const app = express();
 
 // ── CORS ──
 app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'http://localhost:5174',
-        'http://localhost:5175',
-        'http://127.0.0.1:5173',
-        'https://notice-board-liard-three.vercel.app',
-        'https://*.vercel.app',
-        'https://*.onrender.com'
-    ],
+    origin: '*',  // Allow all origins (temporarily for testing)
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
