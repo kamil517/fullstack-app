@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/bitec.png";
 
 // ── DYNAMIC API URL ──
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+// ✅ FIXED: Now includes /api
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -27,7 +28,8 @@ const Login = () => {
     setLoading(true);
     
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      // ✅ FIXED: Removed /api from the path (since it's already in API_URL)
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

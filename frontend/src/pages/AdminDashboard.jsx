@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // ── DYNAMIC API URL ──
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const UPLOADS_URL = API_URL.replace('/api', ''); // For images/uploads
 
 const AdminDashboard = () => {
   const [user, setUser] = useState(null);
@@ -30,7 +31,6 @@ const AdminDashboard = () => {
   const [showNoticeModal, setShowNoticeModal] = useState(false);
   const [viewingNotice, setViewingNotice] = useState(null);
   
-  // ── File upload states ──
   const [file, setFile] = useState(null);
   const [filePreview, setFilePreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +62,7 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/users`);
+      const response = await fetch(`${API_URL}/users`);
       const data = await response.json();
       setUsers(data);
     } catch (error) {
@@ -72,7 +72,7 @@ const AdminDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/notices`);
+      const response = await fetch(`${API_URL}/notices`);
       const data = await response.json();
       const active = data.filter(n => !n.isArchived);
       const archived = data.filter(n => n.isArchived);
@@ -112,7 +112,7 @@ const AdminDashboard = () => {
         formData.append('file', file);
       }
 
-      const response = await fetch(`${API_URL}/api/notices`, {
+      const response = await fetch(`${API_URL}/notices`, {
         method: "POST",
         body: formData
       });
@@ -153,7 +153,7 @@ const AdminDashboard = () => {
     setSubmitting(true);
     
     try {
-      const response = await fetch(`${API_URL}/api/notices/${editingNoticeId}`, {
+      const response = await fetch(`${API_URL}/notices/${editingNoticeId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, content, category })
@@ -181,7 +181,7 @@ const AdminDashboard = () => {
   const archiveNotice = async (id) => {
     if (window.confirm("Archive this notice?")) {
       try {
-        await fetch(`${API_URL}/api/notices/archive/${id}`, { method: "PUT" });
+        await fetch(`${API_URL}/notices/archive/${id}`, { method: "PUT" });
         fetchNotices();
         alert("✅ Notice archived!");
       } catch (error) {
@@ -193,7 +193,7 @@ const AdminDashboard = () => {
   const restoreNotice = async (id) => {
     if (window.confirm("Restore this notice?")) {
       try {
-        await fetch(`${API_URL}/api/notices/restore/${id}`, { method: "PUT" });
+        await fetch(`${API_URL}/notices/restore/${id}`, { method: "PUT" });
         fetchNotices();
         alert("✅ Notice restored!");
       } catch (error) {
@@ -205,7 +205,7 @@ const AdminDashboard = () => {
   const permanentDeleteNotice = async (id) => {
     if (window.confirm("⚠️ Permanently delete this notice?")) {
       try {
-        await fetch(`${API_URL}/api/notices/${id}`, { method: "DELETE" });
+        await fetch(`${API_URL}/notices/${id}`, { method: "DELETE" });
         fetchNotices();
         alert("✅ Notice permanently deleted!");
       } catch (error) {
@@ -230,7 +230,7 @@ const AdminDashboard = () => {
   const handleUpdateUser = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_URL}/api/users/${editingUser._id}`, {
+      const response = await fetch(`${API_URL}/users/${editingUser._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -255,7 +255,7 @@ const AdminDashboard = () => {
   const deleteUser = async (id) => {
     if (window.confirm("Delete this user?")) {
       try {
-        await fetch(`${API_URL}/api/users/${id}`, { method: "DELETE" });
+        await fetch(`${API_URL}/users/${id}`, { method: "DELETE" });
         fetchUsers();
         alert("✅ User deleted!");
       } catch (error) {
@@ -267,7 +267,7 @@ const AdminDashboard = () => {
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${API_URL}/api/users/${user._id}`, {
+      const response = await fetch(`${API_URL}/users/${user._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -481,7 +481,7 @@ const AdminDashboard = () => {
                     <td className="py-3">
                       {notice.fileUrl ? (
                         <a 
-                          href={`${API_URL}${notice.fileUrl}`} 
+                          href={`${UPLOADS_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline text-xs"
@@ -537,7 +537,7 @@ const AdminDashboard = () => {
                     <td className="py-3">
                       {notice.fileUrl ? (
                         <a 
-                          href={`${API_URL}${notice.fileUrl}`} 
+                          href={`${UPLOADS_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline text-xs"
@@ -641,13 +641,13 @@ const AdminDashboard = () => {
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(viewingNotice.fileType) ? (
                   <img 
-                    src={`${API_URL}${viewingNotice.fileUrl}`} 
+                    src={`${UPLOADS_URL}${viewingNotice.fileUrl}`} 
                     alt={viewingNotice.fileName}
                     className="max-w-full max-h-64 rounded-lg"
                   />
                 ) : (
                   <a 
-                    href={`${API_URL}${viewingNotice.fileUrl}`} 
+                    href={`${UPLOADS_URL}${viewingNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline flex items-center gap-2"

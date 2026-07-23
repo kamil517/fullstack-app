@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // ── DYNAMIC API URL ──
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const UPLOADS_URL = API_URL.replace('/api', ''); // For images/uploads
 
 const StudentDashboard = () => {
   const [user, setUser] = useState(null);
@@ -38,7 +39,7 @@ const StudentDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/notices`);
+      const response = await fetch(`${API_URL}/notices`);
       const data = await response.json();
       setNotices(data);
       setFilteredNotices(data);
@@ -234,7 +235,7 @@ const StudentDashboard = () => {
                     <td className="py-3 px-4">
                       {notice.fileUrl ? (
                         <a 
-                          href={`${API_URL}${notice.fileUrl}`} 
+                          href={`${UPLOADS_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:text-blue-700 hover:underline text-xs transition-all duration-300 hover:scale-110 inline-block"
@@ -303,14 +304,14 @@ const StudentDashboard = () => {
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(viewingNotice.fileType) ? (
                   <img 
-                    src={`${API_URL}${viewingNotice.fileUrl}`} 
+                    src={`${UPLOADS_URL}${viewingNotice.fileUrl}`} 
                     alt={viewingNotice.fileName}
                     className="max-w-full max-h-64 rounded-lg border border-gray-200
                       transition-all duration-500 hover:scale-105 hover:shadow-xl"
                   />
                 ) : (
                   <a 
-                    href={`${API_URL}${viewingNotice.fileUrl}`} 
+                    href={`${UPLOADS_URL}${viewingNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-2

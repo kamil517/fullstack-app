@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 // ── DYNAMIC API URL ──
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const UPLOADS_URL = API_URL.replace('/api', ''); // For images/uploads
 
 const FacultyDashboard = () => {
   const [user, setUser] = useState(null);
@@ -45,7 +46,7 @@ const FacultyDashboard = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/notices`);
+      const response = await fetch(`${API_URL}/notices`);
       const data = await response.json();
       setNotices(data);
     } catch (error) {
@@ -74,8 +75,8 @@ const FacultyDashboard = () => {
     try {
       const token = localStorage.getItem("token");
       const url = editingId 
-        ? `${API_URL}/api/notices/${editingId}`
-        : `${API_URL}/api/notices`;
+        ? `${API_URL}/notices/${editingId}`
+        : `${API_URL}/notices`;
       
       const method = editingId ? "PUT" : "POST";
 
@@ -128,6 +129,9 @@ const FacultyDashboard = () => {
         setEditingId(null);
         fetchNotices();
         alert(editingId ? "✅ Notice updated successfully!" : "✅ Notice created successfully!");
+      } else {
+        const error = await response.json();
+        alert(`❌ Error: ${error.message || 'Something went wrong'}`);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -149,9 +153,14 @@ const FacultyDashboard = () => {
 
   const handleDelete = async (id) => {
     if (window.confirm("⚠️ Are you sure you want to delete this notice?")) {
-      await fetch(`${API_URL}/api/notices/${id}`, { method: "DELETE" });
-      fetchNotices();
-      alert("🗑️ Notice deleted successfully!");
+      try {
+        await fetch(`${API_URL}/notices/${id}`, { method: "DELETE" });
+        fetchNotices();
+        alert("🗑️ Notice deleted successfully!");
+      } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Error deleting notice");
+      }
     }
   };
 
@@ -277,39 +286,41 @@ const FacultyDashboard = () => {
                 {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
               </select>
 
-              <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-yellow-400 transition-all duration-300">
-                {!file ? (
-                  <label className="cursor-pointer block text-center text-gray-500">
-                    <span className="text-3xl block">📎</span>
-                    <span>Click to attach file (PDF, JPEG, PNG, GIF)</span>
-                    <input 
-                      type="file" 
-                      accept=".pdf,.jpg,.jpeg,.png,.gif" 
-                      onChange={handleFileChange} 
-                      className="hidden" 
-                    />
-                  </label>
-                ) : (
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center bg-white/70 p-2 rounded-lg">
-                      <span className="text-sm">📄 {file.name}</span>
-                      <button 
-                        type="button"
-                        onClick={() => {
-                          setFile(null);
-                          setFilePreview(null);
-                        }} 
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        ✕
-                      </button>
+              {!editingId && (
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 hover:border-yellow-400 transition-all duration-300">
+                  {!file ? (
+                    <label className="cursor-pointer block text-center text-gray-500">
+                      <span className="text-3xl block">📎</span>
+                      <span>Click to attach file (PDF, JPEG, PNG, GIF)</span>
+                      <input 
+                        type="file" 
+                        accept=".pdf,.jpg,.jpeg,.png,.gif" 
+                        onChange={handleFileChange} 
+                        className="hidden" 
+                      />
+                    </label>
+                  ) : (
+                    <div className="space-y-2">
+                      <div className="flex justify-between items-center bg-white/70 p-2 rounded-lg">
+                        <span className="text-sm">📄 {file.name}</span>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            setFile(null);
+                            setFilePreview(null);
+                          }} 
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      {filePreview && (
+                        <img src={filePreview} className="max-h-32 rounded-lg border" alt="preview" />
+                      )}
                     </div>
-                    {filePreview && (
-                      <img src={filePreview} className="max-h-32 rounded-lg border" alt="preview" />
-                    )}
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               <button 
                 type="submit" 
@@ -376,7 +387,7 @@ const FacultyDashboard = () => {
                   <td className="py-3 px-4">
                     {notice.fileUrl ? (
                       <a 
-                        href={`${API_URL}${notice.fileUrl}`} 
+                        href={`${UPLOADS_URL}${notice.fileUrl}`} 
                         target="_blank" 
                         rel="noopener noreferrer"
                         className="text-blue-500 hover:text-blue-700 hover:underline text-xs transition-colors"
@@ -456,13 +467,13 @@ const FacultyDashboard = () => {
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(viewingNotice.fileType) ? (
                   <img 
-                    src={`${API_URL}${viewingNotice.fileUrl}`} 
+                    src={`${UPLOADS_URL}${viewingNotice.fileUrl}`} 
                     alt={viewingNotice.fileName}
                     className="max-w-full max-h-64 rounded-lg border border-gray-200"
                   />
                 ) : (
                   <a 
-                    href={`${API_URL}${viewingNotice.fileUrl}`} 
+                    href={`${UPLOADS_URL}${viewingNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:text-blue-700 hover:underline flex items-center gap-2"

@@ -1,14 +1,15 @@
 import { useEffect, useState, useRef } from "react";
-import logo from "../assets/bitec.png"; // Your logo
+import logo from "../assets/bitec.png";
 
 // ── DYNAMIC API URL ──
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const UPLOADS_URL = API_URL.replace('/api', ''); // For images/uploads
 
 const PublicDisplay = () => {
   const [notices, setNotices] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [rotationInterval] = useState(10000); // 10 seconds
+  const [rotationInterval] = useState(10000);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef(null);
 
@@ -18,7 +19,6 @@ const PublicDisplay = () => {
     return () => clearInterval(refreshInterval);
   }, []);
 
-  // Auto-rotation for display
   useEffect(() => {
     if (notices.length > 1) {
       const interval = setInterval(() => {
@@ -30,7 +30,7 @@ const PublicDisplay = () => {
 
   const fetchNotices = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/notices`);
+      const response = await fetch(`${API_URL}/notices`);
       const data = await response.json();
       setNotices(data);
       setLoading(false);
@@ -66,7 +66,6 @@ const PublicDisplay = () => {
     return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
-  // ── Helper to check if file is image ──
   const isImage = (fileType) => fileType?.startsWith('image/');
   const isPDF = (fileType) => fileType === 'application/pdf';
 
@@ -75,10 +74,8 @@ const PublicDisplay = () => {
   return (
     <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       
-      {/* Full Screen Display */}
       <div className="fixed inset-0 flex flex-col">
         
-        {/* Top Bar - Date and Time with Full Screen Button */}
         <div className="bg-black/50 backdrop-blur-md p-4 z-20">
           <div className="container mx-auto flex justify-between items-center">
             <div className="flex items-center gap-3">
@@ -118,7 +115,6 @@ const PublicDisplay = () => {
           </div>
         </div>
 
-        {/* Main Display Content */}
         <div className="flex-1 flex items-center justify-center p-8 overflow-auto">
           {loading ? (
             <div className="text-center">
@@ -147,7 +143,6 @@ const PublicDisplay = () => {
           ) : (
             <div className="max-w-6xl w-full">
               
-              {/* Progress Bar */}
               <div className="mb-8">
                 <div className="h-1.5 bg-white/20 rounded-full overflow-hidden">
                   <div 
@@ -162,7 +157,6 @@ const PublicDisplay = () => {
                 </div>
               </div>
 
-              {/* Navigation Arrows */}
               {notices.length > 1 && (
                 <>
                   <button 
@@ -180,7 +174,6 @@ const PublicDisplay = () => {
                 </>
               )}
 
-              {/* Slide Indicators */}
               <div className="flex justify-center gap-3 mb-8">
                 {notices.map((_, idx) => (
                   <button
@@ -195,10 +188,8 @@ const PublicDisplay = () => {
                 ))}
               </div>
 
-              {/* ── MAIN NOTICE CARD ── */}
               <div className="bg-white/10 backdrop-blur-md rounded-3xl p-12 shadow-2xl border border-white/20 min-h-[500px] flex flex-col justify-between">
                 
-                {/* Category Badge */}
                 <div className="mb-6">
                   <span className={`px-4 py-2 rounded-full text-sm font-semibold tracking-wide ${
                     currentNotice?.category === "Academic" ? "bg-blue-500" :
@@ -210,25 +201,25 @@ const PublicDisplay = () => {
                   </span>
                 </div>
 
-                {/* Title */}
                 <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight tracking-tight font-['Playfair_Display','Georgia',serif]">
                   {currentNotice?.title}
                 </h1>
 
-                {/* Content */}
                 <p className="text-xl md:text-2xl text-gray-200 leading-relaxed mb-8 font-['Open_Sans','Arial',sans-serif]">
                   {currentNotice?.content}
                 </p>
 
-                {/* ── FILE ATTACHMENT ── */}
                 {currentNotice?.fileUrl && (
                   <div className="mb-6 p-4 bg-white/10 rounded-xl border border-white/10">
                     {isImage(currentNotice.fileType) ? (
                       <div className="text-center">
                         <img 
-                          src={`${API_URL}${currentNotice.fileUrl}`} 
+                          src={`${UPLOADS_URL}${currentNotice.fileUrl}`} 
                           alt={currentNotice.fileName}
                           className="max-w-full max-h-96 rounded-lg mx-auto shadow-lg"
+                          onError={(e) => {
+                            console.error('Image failed to load:', e.target.src);
+                          }}
                         />
                         <p className="text-sm text-gray-300 mt-2">📷 {currentNotice.fileName}</p>
                       </div>
@@ -238,7 +229,7 @@ const PublicDisplay = () => {
                         <div>
                           <p className="text-white text-lg font-medium">{currentNotice.fileName}</p>
                           <a 
-                            href={`${API_URL}${currentNotice.fileUrl}`} 
+                            href={`${UPLOADS_URL}${currentNotice.fileUrl}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-blue-400 hover:text-blue-300 underline text-sm"
@@ -253,7 +244,7 @@ const PublicDisplay = () => {
                         <div>
                           <p className="text-white text-lg font-medium">{currentNotice.fileName}</p>
                           <a 
-                            href={`${API_URL}${currentNotice.fileUrl}`} 
+                            href={`${UPLOADS_URL}${currentNotice.fileUrl}`} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="text-blue-400 hover:text-blue-300 underline text-sm"
@@ -266,7 +257,6 @@ const PublicDisplay = () => {
                   </div>
                 )}
 
-                {/* Footer with Logo */}
                 <div className="flex flex-wrap justify-between items-center text-sm text-gray-400 border-t border-white/20 pt-6 gap-4">
                   <div className="flex flex-wrap gap-6">
                     <span className="flex items-center gap-1">📅 {new Date(currentNotice?.createdAt).toLocaleDateString()}</span>
@@ -288,7 +278,6 @@ const PublicDisplay = () => {
                 </div>
               </div>
 
-              {/* Rotation Info */}
               <div className="text-center mt-6 text-sm text-gray-400">
                 🔄 Auto-rotating every {rotationInterval / 1000} seconds • Next notice in {rotationInterval / 1000} seconds
               </div>
@@ -296,7 +285,6 @@ const PublicDisplay = () => {
           )}
         </div>
 
-        {/* Bottom Marquee with Logo */}
         <div className="bg-black/50 backdrop-blur-md py-3 overflow-hidden">
           <div className="whitespace-nowrap animate-marquee text-sm text-gray-300 flex items-center justify-center gap-4">
             <div className="flex items-center gap-2">
@@ -315,7 +303,6 @@ const PublicDisplay = () => {
         </div>
       </div>
 
-      {/* CSS Animations & Font Imports */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
         
@@ -349,7 +336,6 @@ const PublicDisplay = () => {
         }
       `}</style>
 
-      {/* Real-time clock update script */}
       <script dangerouslySetInnerHTML={{
         __html: `
           function updateClock() {

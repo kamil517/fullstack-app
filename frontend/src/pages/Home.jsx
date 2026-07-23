@@ -6,7 +6,8 @@ import { FaPaperPlane, FaLocationDot, FaEnvelope, FaPhone, FaUser, FaRocket } fr
 import emailjs from '@emailjs/browser';
 
 // ── API URL FOR PRODUCTION ──
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
+const UPLOADS_URL = API_URL.replace('/api', ''); // For images/uploads
 
 // EmailJS Configuration
 const EMAILJS_SERVICE_ID = 'service_3jo7xbf';
@@ -76,7 +77,7 @@ export default function Home() {
   useEffect(() => {
     const fetchNotices = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/notices`);
+        const response = await fetch(`${API_URL}/notices`);
         const data = await response.json();
         setNotices(data.slice(0, 3));
         setLoading(false);
@@ -88,10 +89,10 @@ export default function Home() {
 
     const fetchStats = async () => {
       try {
-        const noticesRes = await fetch(`${API_URL}/api/notices`);
+        const noticesRes = await fetch(`${API_URL}/notices`);
         const noticesData = await noticesRes.json();
         
-        const usersRes = await fetch(`${API_URL}/api/users`);
+        const usersRes = await fetch(`${API_URL}/users`);
         const usersData = await usersRes.json();
         
         setStats({
@@ -684,13 +685,16 @@ export default function Home() {
                     <div className="mt-3 p-2 bg-gray-50 rounded-lg border border-gray-200">
                       {isImage(notice.fileType) ? (
                         <img 
-                          src={`${API_URL}${notice.fileUrl}`} 
+                          src={`${UPLOADS_URL}${notice.fileUrl}`} 
                           alt={notice.fileName}
                           className="w-full max-h-48 object-cover rounded-lg"
+                          onError={(e) => {
+                            console.error('Image failed to load:', e.target.src);
+                          }}
                         />
                       ) : (
                         <a 
-                          href={`${API_URL}${notice.fileUrl}`} 
+                          href={`${UPLOADS_URL}${notice.fileUrl}`} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="text-blue-500 hover:underline flex items-center gap-2 text-sm"
@@ -759,13 +763,16 @@ export default function Home() {
                 <p className="text-sm text-gray-500 mb-2">📎 Attachment:</p>
                 {isImage(selectedNotice.fileType) ? (
                   <img 
-                    src={`${API_URL}${selectedNotice.fileUrl}`} 
+                    src={`${UPLOADS_URL}${selectedNotice.fileUrl}`} 
                     alt={selectedNotice.fileName}
                     className="w-full max-h-64 object-contain rounded-lg"
+                    onError={(e) => {
+                      console.error('Image failed to load:', e.target.src);
+                    }}
                   />
                 ) : (
                   <a 
-                    href={`${API_URL}${selectedNotice.fileUrl}`} 
+                    href={`${UPLOADS_URL}${selectedNotice.fileUrl}`} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-blue-500 hover:underline flex items-center gap-2"
@@ -905,32 +912,32 @@ export default function Home() {
       </div>
 
       {/* ── CTA SECTION WITH GOLD TITLE ── */}
-<div className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-white py-20">
-  <div className="max-w-[800px] mx-auto px-5 text-center">
-    <h3 className="text-3xl md:text-4xl font-bold mb-4 font-['Times_New_Roman','Georgia',serif] bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
-      Start Engaging Now
-    </h3>
-    <p className="text-gray-600 text-lg mb-8 max-w-xl mx-auto">
-      Thousands of students and faculty already using our platform for campus communication
-    </p>
-    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-      <Link to="/register">
-        <button className="px-8 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-[#5158bb] to-[#667eea] hover:from-[#667eea] hover:to-[#5158bb] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
-           Get Started
-        </button>
-      </Link>
-      <a 
-        href="https://bdu.edu.et" 
-        target="_blank" 
-        rel="noopener noreferrer"
-      >
-        <button className="px-8 py-3 rounded-full font-semibold text-[#5158bb] bg-white border-2 border-[#5158bb] hover:bg-[#5158bb] hover:text-white transition-all duration-300 hover:scale-105">
-          Learn More
-        </button>
-      </a>
-    </div>
-  </div>
-</div>
+      <div className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-white py-20">
+        <div className="max-w-[800px] mx-auto px-5 text-center">
+          <h3 className="text-3xl md:text-4xl font-bold mb-4 font-['Times_New_Roman','Georgia',serif] bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 bg-clip-text text-transparent">
+            Start Engaging Now
+          </h3>
+          <p className="text-gray-600 text-lg mb-8 max-w-xl mx-auto">
+            Thousands of students and faculty already using our platform for campus communication
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/register">
+              <button className="px-8 py-3 rounded-full font-semibold text-white bg-gradient-to-r from-[#5158bb] to-[#667eea] hover:from-[#667eea] hover:to-[#5158bb] shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                 Get Started
+              </button>
+            </Link>
+            <a 
+              href="https://bdu.edu.et" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              <button className="px-8 py-3 rounded-full font-semibold text-[#5158bb] bg-white border-2 border-[#5158bb] hover:bg-[#5158bb] hover:text-white transition-all duration-300 hover:scale-105">
+                Learn More
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
 
       {/* ── CONTACT SECTION - WHITE BACKGROUND ── */}
       <div id="contact" className="relative w-screen left-1/2 right-1/2 -ml-[50vw] -mr-[50vw] bg-white py-20">
