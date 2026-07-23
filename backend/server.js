@@ -11,7 +11,15 @@ const app = express();
 
 // ── CORS ──
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173', 'https://*.onrender.com'],
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://localhost:5175',
+        'http://127.0.0.1:5173',
+        'https://notice-board-liard-three.vercel.app',
+        'https://*.vercel.app',
+        'https://*.onrender.com'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -98,7 +106,7 @@ const noticeSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 const Notice = mongoose.model('Notice', noticeSchema);
 
-// ✅ ── ROOT ROUTE (ADD THIS FIRST!) ──
+// ✅ ── ROOT ROUTE ──
 app.get('/', (req, res) => {
     res.json({
         success: true,
