@@ -5,13 +5,13 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const sendEmail = require('./config/email'); // ── ADD THIS ──
+const sendEmail = require('./config/email');
 
 const app = express();
 
 // ── CORS ──
 app.use(cors({
-    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173'],
+    origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://127.0.0.1:5173', 'https://*.onrender.com'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -97,6 +97,48 @@ const noticeSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 const Notice = mongoose.model('Notice', noticeSchema);
+
+// ✅ ── ROOT ROUTE (ADD THIS FIRST!) ──
+app.get('/', (req, res) => {
+    res.json({
+        success: true,
+        message: '🎉 Digital Notice Board API is running!',
+        status: 'active',
+        version: '1.0.0',
+        server: {
+            uploadsFolder: path.join(__dirname, 'uploads'),
+            database: mongoose.connection.name || 'connected'
+        },
+        endpoints: {
+            test: '/test',
+            auth: {
+                register: '/api/auth/register (POST)',
+                login: '/api/auth/login (POST)'
+            },
+            notices: {
+                getAll: '/api/notices (GET)',
+                getOne: '/api/notices/:id (GET)',
+                create: '/api/notices (POST)',
+                update: '/api/notices/:id (PUT)',
+                delete: '/api/notices/:id (DELETE)',
+                archive: '/api/notices/archive/:id (PUT)',
+                restore: '/api/notices/restore/:id (PUT)'
+            },
+            users: '/api/users (GET)',
+            contact: '/api/contact (POST)'
+        },
+        timestamp: new Date().toISOString()
+    });
+});
+
+// ── TEST ROUTE ──
+app.get('/test', (req, res) => {
+    res.json({ 
+        success: true,
+        message: '✅ Server is working perfectly!',
+        timestamp: new Date().toISOString()
+    });
+});
 
 // ── AUTH ROUTES ──
 app.post('/api/auth/register', async (req, res) => {
@@ -312,15 +354,11 @@ app.delete('/api/users/:id', async (req, res) => {
     }
 });
 
-// ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ──
-// ── NEW: CONTACT FORM WITH EMAIL NOTIFICATION ──
-// ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ──
-
+// ── CONTACT FORM WITH EMAIL ──
 app.post('/api/contact', async (req, res) => {
     try {
         const { name, email, subject, message } = req.body;
         
-        // ── VALIDATE ──
         if (!name || !email || !subject || !message) {
             return res.status(400).json({ 
                 success: false, 
@@ -336,7 +374,6 @@ app.post('/api/contact', async (req, res) => {
             });
         }
         
-        // ── SEND EMAIL TO ADMIN ──
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@bitnoticeboard.edu.et';
         
         const emailHtml = `
@@ -356,7 +393,6 @@ app.post('/api/contact', async (req, res) => {
         
         await sendEmail(adminEmail, `📩 New Contact: ${subject}`, emailHtml);
         
-        // ── SEND AUTO-REPLY TO USER ──
         const replyHtml = `
             <h2 style="color: #1a1a2e;">Thank you for contacting us! 🙏</h2>
             <p>Hi ${name},</p>
@@ -388,19 +424,13 @@ app.post('/api/contact', async (req, res) => {
     }
 });
 
-// ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ── ──
-
-// ── TEST ROUTE ──
-app.get('/test', (req, res) => {
-    res.json({ message: 'Server working on port 8080!' });
-});
-
 // ── 404 HANDLER ──
 app.use((req, res) => {
     console.log('❌ 404:', req.method, req.url);
     res.status(404).json({ 
         error: 'Route not found', 
-        path: req.url 
+        path: req.url,
+        availableRoutes: ['/', '/test', '/api/auth/*', '/api/notices/*', '/api/users', '/api/contact']
     });
 });
 
@@ -410,14 +440,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message });
 });
 
-// ── START SERVER ──
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`\n✅ Server running on http://localhost:${PORT}`);
-    console.log(`📁 Uploads folder: ${path.join(__dirname, 'uploads')}`);
-    console.log(`\n🔗 Test: http://localhost:${PORT}/test`);
-});
-// ── EXPORT FOR VERCEL ──
+// ── EXPORT FOR RENDER ──
 module.exports = app;
 
 // ── START SERVER (LOCAL) ──
@@ -427,5 +450,6 @@ if (require.main === module) {
         console.log(`\n✅ Server running on http://localhost:${PORT}`);
         console.log(`📁 Uploads folder: ${path.join(__dirname, 'uploads')}`);
         console.log(`\n🔗 Test: http://localhost:${PORT}/test`);
+        console.log(`🔗 Root: http://localhost:${PORT}/`);
     });
 }
