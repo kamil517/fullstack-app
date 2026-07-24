@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+﻿import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
@@ -17,11 +17,9 @@ const AppRoutes = () => {
       <Route path="/faculty" element={<FacultyDashboard />} />
       <Route path="/student" element={<StudentDashboard />} />
       <Route path="/display" element={<PublicDisplay />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 };
 
 export default AppRoutes;
-
-
-

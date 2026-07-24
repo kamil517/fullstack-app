@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import logo from "../assets/bitec.png";
 
 // ── DYNAMIC API URL ──
-// ✅ FIXED: Now includes /api
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080/api';
 
 const Login = () => {
@@ -28,7 +27,6 @@ const Login = () => {
     setLoading(true);
     
     try {
-      // ✅ FIXED: Removed /api from the path (since it's already in API_URL)
       const response = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -47,12 +45,13 @@ const Login = () => {
           localStorage.removeItem('rememberedEmail');
         }
         
+        // ✅ FIXED: Using navigate instead of window.location
         if (data.user.role === "admin") {
-          window.location.href = "/admin";
+          navigate("/admin");
         } else if (data.user.role === "faculty") {
-          window.location.href = "/faculty";
+          navigate("/faculty");
         } else {
-          window.location.href = "/student";
+          navigate("/student");
         }
       } else {
         setError(data.message || "Login failed");
